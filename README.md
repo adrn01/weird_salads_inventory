@@ -1,24 +1,9 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+We need to create the DB and seed with the initial data before starting the app for the first time.
+We want to do this per location, so we will pass in the LOCATION_ID env variable.
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+rails db:create
+LOCATION_ID=13 rails db:seed
+```
