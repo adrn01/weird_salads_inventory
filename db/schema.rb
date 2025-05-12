@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_12_194434) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_12_205707) do
   create_table "ingredients", charset: "utf8mb4", force: :cascade do |t|
     t.string "name"
     t.string "unit"
@@ -30,7 +30,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_194434) do
     t.decimal "price", precision: 10, scale: 2
     t.bigint "recipe_id", null: false
     t.bigint "location_id", null: false
-    t.bigint "modifier_id", null: false
+    t.bigint "modifier_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["location_id"], name: "index_menu_items_on_location_id"
@@ -38,13 +38,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_194434) do
     t.index ["recipe_id"], name: "index_menu_items_on_recipe_id"
   end
 
-  create_table "modifer_options", charset: "utf8mb4", force: :cascade do |t|
+  create_table "modifier_options", charset: "utf8mb4", force: :cascade do |t|
     t.string "name"
     t.decimal "price", precision: 10, scale: 2
     t.bigint "modifier_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["modifier_id"], name: "index_modifer_options_on_modifier_id"
+    t.index ["modifier_id"], name: "index_modifier_options_on_modifier_id"
   end
 
   create_table "modifiers", charset: "utf8mb4", force: :cascade do |t|
@@ -56,10 +56,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_194434) do
   create_table "recipe_ingredients", charset: "utf8mb4", force: :cascade do |t|
     t.decimal "quantity", precision: 10, scale: 2
     t.bigint "recipe_id", null: false
-    t.bigint "ingredients_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["ingredients_id"], name: "index_recipe_ingredients_on_ingredients_id"
+    t.bigint "ingredient_id"
+    t.index ["ingredient_id"], name: "index_recipe_ingredients_on_ingredient_id"
     t.index ["recipe_id"], name: "index_recipe_ingredients_on_recipe_id"
   end
 
@@ -84,8 +84,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_194434) do
   add_foreign_key "menu_items", "locations"
   add_foreign_key "menu_items", "modifiers"
   add_foreign_key "menu_items", "recipes"
-  add_foreign_key "modifer_options", "modifiers"
-  add_foreign_key "recipe_ingredients", "ingredients", column: "ingredients_id"
+  add_foreign_key "modifier_options", "modifiers"
   add_foreign_key "recipe_ingredients", "recipes"
   add_foreign_key "staff_members", "locations"
 end
