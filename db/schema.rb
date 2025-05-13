@@ -10,13 +10,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_12_205707) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_13_185325) do
+  create_table "audits", charset: "utf8mb4", force: :cascade do |t|
+    t.integer "auditable_id"
+    t.string "auditable_type"
+    t.integer "associated_id"
+    t.string "associated_type"
+    t.integer "user_id"
+    t.string "user_type"
+    t.string "username"
+    t.string "action"
+    t.text "audited_changes"
+    t.integer "version", default: 0
+    t.string "comment"
+    t.string "remote_address"
+    t.string "request_uuid"
+    t.datetime "created_at"
+    t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id", "version"], name: "auditable_index"
+    t.index ["created_at"], name: "index_audits_on_created_at"
+    t.index ["request_uuid"], name: "index_audits_on_request_uuid"
+    t.index ["user_id", "user_type"], name: "user_index"
+  end
+
   create_table "ingredients", charset: "utf8mb4", force: :cascade do |t|
     t.string "name"
     t.string "unit"
     t.decimal "cost", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "inventory_items", charset: "utf8mb4", force: :cascade do |t|
+    t.bigint "ingredient_id"
+    t.decimal "quantity", precision: 10, scale: 2, default: "0.0"
+    t.bigint "updated_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ingredient_id"], name: "index_inventory_items_on_ingredient_id"
+    t.index ["updated_by_id"], name: "index_inventory_items_on_updated_by_id"
   end
 
   create_table "locations", charset: "utf8mb4", force: :cascade do |t|
@@ -81,6 +113,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_205707) do
     t.index ["location_id"], name: "index_staff_members_on_location_id"
   end
 
+  add_foreign_key "inventory_items", "ingredients"
+  add_foreign_key "inventory_items", "staff_members", column: "updated_by_id"
   add_foreign_key "menu_items", "locations"
   add_foreign_key "menu_items", "modifiers"
   add_foreign_key "menu_items", "recipes"
