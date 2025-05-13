@@ -1,0 +1,139 @@
+<%# Main content %>
+<div class="grid-container">
+  <div class="grid-x grid-padding-x">
+    <div class="cell">
+      <h1 class="text-center">Inventory Management</h1>
+      
+      <% if notice %>
+        <div class="callout success" data-closable>
+          <%= notice %>
+          <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      <% end %>
+
+      <div class="table-scroll">
+        <table class="hover">
+          <thead>
+            <tr>
+              <th>Ingredient</th>
+              <th>Current Quantity</th>
+              <th>Last Updated By</th>
+              <th>Last Updated At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @inventory_items.each do |item| %>
+              <tr>
+                <td><%= link_to item.ingredient.name, inventory_item_path(item), class: "link" %></td>
+                <td><%= item.quantity %></td>
+                <td><%= item.staff_member&.name %></td>
+                <td><%= item.updated_at&.strftime("%B %d, %Y %H:%M") %></td>
+                <td>
+                  <button class="button small" data-open="update-modal-<%= item.id %>">
+                    Update Quantity
+                  </button>
+                </td>
+              </tr>
+
+              <%# Modal for updating quantity %>
+              <div class="reveal" id="update-modal-<%= item.id %>" data-reveal>
+                <h3>Update <%= item.ingredient.name %> Quantity</h3>
+                <%= form_with(model: item, local: true) do |f| %>
+                  <div class="grid-container">
+                    <div class="grid-x grid-padding-x">
+                      <div class="cell">
+                        <label>
+                          New Quantity
+                          <%= f.number_field :quantity, step: :any, required: true, 
+                              data: { 
+                                current: item.quantity,
+                                increase_reasons: @update_reasons_increase.to_json,
+                                decrease_reasons: @update_reasons_decrease.to_json
+                              },
+                              class: "quantity-field" %>
+                        </label>
+                      </div>
+
+                      <div class="cell">
+                        <label>
+                          Updated By
+                          <%= f.collection_select :updated_by_id, @staff_members, :id, :name, 
+                              { prompt: "Select staff member" }, 
+                              { required: true } %>
+                        </label>
+                      </div>
+
+                      <div class="cell">
+                        <label>
+                          Reason for Update
+                          <%= f.select :audit_comment, 
+                              options_for_select(@update_reasons_increase), 
+                              { prompt: "Select a reason" }, 
+                              { required: true, class: "audit-reason-select" } %>
+                        </label>
+                      </div>
+
+                      <div class="cell">
+                        <%= f.submit "Update", class: "button expanded" %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+                <button class="close-button" data-close aria-label="Close modal" type="button">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# Initialize Foundation and custom JavaScript %>
+<script>
+  $(document).foundation();
+
+  $(document).ready(function() {
+    $('.quantity-field').on('change', function() {
+      const $field = $(this);
+      const currentQuantity = parseFloat($field.data('current'));
+      const newQuantity = parseFloat($field.val());
+      const $reasonSelect = $field.closest('form').find('.audit-reason-select');
+      
+      // Get the reasons from data attributes
+      const increaseReasons = JSON.parse($field.data('increase-reasons'));
+      const decreaseReasons = JSON.parse($field.data('decrease-reasons'));
+      
+      // Clear current options
+      $reasonSelect.empty();
+      
+      // Add appropriate options based on quantity change
+      if (newQuantity > currentQuantity) {
+        // Increase
+        increaseReasons.forEach(reason => {
+          $reasonSelect.append(new Option(reason, reason));
+        });
+      } else if (newQuantity < currentQuantity) {
+        // Decrease
+        decreaseReasons.forEach(reason => {
+          $reasonSelect.append(new Option(reason, reason));
+        });
+      } else {
+        // Same quantity - show both sets of reasons
+        const allReasons = [...new Set([...increaseReasons, ...decreaseReasons])];
+        allReasons.forEach(reason => {
+          $reasonSelect.append(new Option(reason, reason));
+        });
+      }
+      
+      // Add prompt option
+      $reasonSelect.prepend(new Option("Select a reason", ""));
+      $reasonSelect.val(""); // Reset to prompt
+    });
+  });
+</script>

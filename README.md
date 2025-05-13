@@ -7,3 +7,9 @@ We want to do this per location, so we will pass in the LOCATION_ID env variable
 rails db:create
 LOCATION_ID=13 rails db:seed
 ```
+
+To start the server:
+
+```
+LOCATION_ID=13 rails s
+```

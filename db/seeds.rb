@@ -21,7 +21,10 @@ CSV.foreach(staff_members_path, headers: true) do |row|
 end
 
 CSV.foreach(ingredients_path, headers: true) do |row|
-  Ingredient.find_or_create_by!(id: row["ingredient_id"], name: row["name"], unit: row["unit"], cost: row["cost"])
+  ingredient = Ingredient.find_or_create_by!(id: row["ingredient_id"], name: row["name"], unit: row["unit"], cost: row["cost"])
+  if InventoryItem.where(ingredient: ingredient).empty?
+    InventoryItem.create!(ingredient: ingredient, audit_comment: "Imported from spreadsheet")
+  end
 end
 
 CSV.foreach(recipes_path, headers: true) do |row|
