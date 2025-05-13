@@ -118,8 +118,8 @@
       const $reasonSelect = $field.closest('form').find('.audit-reason-select');
       
       // Get the reasons from data attributes
-      const increaseReasons = JSON.parse($field.data('increase-reasons'));
-      const decreaseReasons = JSON.parse($field.data('decrease-reasons'));
+      const increaseReasons = $field.data('increase-reasons');
+      const decreaseReasons = $field.data('decrease-reasons');
       
       // Clear current options
       $reasonSelect.empty();

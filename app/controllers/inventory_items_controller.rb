@@ -15,6 +15,7 @@ class InventoryItemsController < ApplicationController
   end
 
   def create
+    # TODO: Implement create later
   end
 
   def update

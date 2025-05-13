@@ -51,7 +51,8 @@
                               data: { 
                                 current: item.quantity,
                                 increase_reasons: @update_reasons_increase.to_json,
-                                decrease_reasons: @update_reasons_decrease.to_json
+                                decrease_reasons: @update_reasons_decrease.to_json,
+                                modal_id: "update-modal-#{item.id}"
                               },
                               class: "quantity-field" %>
                         </label>
@@ -70,7 +71,7 @@
                         <label>
                           Reason for Update
                           <%= f.select :audit_comment, 
-                              options_for_select(@update_reasons_increase), 
+                              options_for_select(@update_reasons_increase + @update_reasons_decrease), 
                               { prompt: "Select a reason" }, 
                               { required: true, class: "audit-reason-select" } %>
                         </label>
@@ -103,11 +104,11 @@
       const $field = $(this);
       const currentQuantity = parseFloat($field.data('current'));
       const newQuantity = parseFloat($field.val());
-      const $reasonSelect = $field.closest('form').find('.audit-reason-select');
+      const $reasonSelect = $(`#${$field.data('modal-id')} .audit-reason-select`);
       
       // Get the reasons from data attributes
-      const increaseReasons = JSON.parse($field.data('increase-reasons'));
-      const decreaseReasons = JSON.parse($field.data('decrease-reasons'));
+      const increaseReasons = $field.data('increase-reasons');
+      const decreaseReasons = $field.data('decrease-reasons');
       
       // Clear current options
       $reasonSelect.empty();
