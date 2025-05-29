@@ -21,6 +21,8 @@ class InventoryItemsController < ApplicationController
   def update
     @inventory_item = InventoryItem.find(params[:id])
 
+    Audited.current_user_method = :staff_member
+
     if @inventory_item.update(inventory_item_params)
       respond_to do |format|
         format.html { redirect_to inventory_items_path, notice: "Inventory item was successfully updated." }
@@ -38,5 +40,9 @@ class InventoryItemsController < ApplicationController
 
   def inventory_item_params
     params.require(:inventory_item).permit(:quantity, :updated_by_id, :audit_comment)
+  end
+
+  def staff_member
+    StaffMember.find(inventory_item_params[:updated_by_id])
   end
 end
